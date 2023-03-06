@@ -2,33 +2,14 @@ import 'package:casio_calculator/home/components/keypad.dart';
 import 'package:casio_calculator/utils/color_constants.dart';
 import 'package:casio_calculator/utils/constants.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:flutter_staggered_grid_view/flutter_staggered_grid_view.dart';
 
-class HomeView extends HookWidget {
+class HomeView extends StatelessWidget {
   const HomeView({Key? key}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
     final size = MediaQuery.of(context).size;
-
-    final animationController = useAnimationController(
-      duration: const Duration(milliseconds: 500),
-      lowerBound: 0.0,
-      upperBound: 0.1,
-    )..addListener(() { });
-
-    final scale = useState<double>(1 - animationController.value);
-
-    void tapDown(TapDownDetails details) {
-      // print(scale);
-      animationController.forward();
-    }
-
-    void tapUp(TapUpDetails details) {
-      print(scale);
-    animationController.reverse();
-  }
 
     return Scaffold(
       body: SafeArea(
@@ -93,14 +74,7 @@ class HomeView extends HookWidget {
                         return StaggeredGridTile.count(
                           crossAxisCellCount: crossAxisCellCount,
                           mainAxisCellCount: 1,
-                          child: GestureDetector(
-                            onTapDown: tapDown,
-                            onTapUp: tapUp,
-                            child: Transform.scale(
-                              scale: scale.value,
-                              child: Keypad(keypadModel: keypad),
-                            ),
-                          ),
+                          child: Keypad(keypadModel: keypad),
                         );
                       }),
                     ],
