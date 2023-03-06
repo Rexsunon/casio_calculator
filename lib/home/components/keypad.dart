@@ -2,65 +2,60 @@ import 'package:casio_calculator/model/model.dart';
 import 'package:casio_calculator/utils/color_constants.dart';
 import 'package:casio_calculator/utils/constants.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:google_fonts/google_fonts.dart';
 
-class Keypad extends StatelessWidget {
+class Keypad extends HookWidget {
   const Keypad({Key? key, required this.keypadModel}) : super(key: key);
 
   final KeypadModel keypadModel;
 
   @override
   Widget build(BuildContext context) {
-    double kKeypadWidth = 80;
-    double kKeypadShadowWidth = 78;
-    double kKeypadShadowHeight = 75;
-    double kKeypadHeight = 75;
 
-    if (keypadModel.text == '0') {
-      kKeypadWidth = 182;
-      kKeypadShadowWidth = 178;
-    }
+    final animationController = useAnimationController(
+      duration: const Duration(milliseconds: 500),
+      lowerBound: 0.0,
+      upperBound: 0.1,
+    );
 
-    return SizedBox(
-      width: 100,
-      height: 80,
-      child: Stack(
-        children: [
-          Align(
-            alignment: Alignment.bottomRight,
-            child: Container(
-              width: kKeypadShadowWidth,
-              height: kKeypadShadowHeight,
-              decoration: BoxDecoration(
-                border: Border.all(),
-                borderRadius: BorderRadius.circular(10),
-                color: kJetBlackColor,
+    final scale = useState<double>(1 - animationController.value);
+
+    void tapDown(TapDownDetails details) => animationController.forward();
+
+    void tapUp(TapUpDetails details) => animationController.reverse();
+
+    return GestureDetector(
+      onTapDown: tapDown,
+      onTapUp: tapUp,
+      child: Transform.scale(
+        scale: 1 - animationController.value,
+        child: Container(
+          width: kKeypadWidth,
+          height: kKeypadHeight,
+          decoration: BoxDecoration(
+            border: Border.all(width: 3),
+            borderRadius: BorderRadius.circular(10),
+            color: kLightGrayColor,
+            boxShadow: const [
+              BoxShadow(
+                color: Colors.black,
+                blurStyle: BlurStyle.solid,
+                offset: Offset(3.3, 5.5),
+              ),
+            ],
+          ),
+          child: Center(
+            child: Text(
+              keypadModel.text,
+              style: GoogleFonts.bungee(
+                fontSize: 28,
+                fontWeight: FontWeight.w700,
+                color: keypadModel.color,
               ),
             ),
           ),
-          Align(
-            alignment: Alignment.topLeft,
-            child: Container(
-              width: kKeypadWidth,
-              height: kKeypadHeight,
-              decoration: BoxDecoration(
-                border: Border.all(width: 3),
-                borderRadius: BorderRadius.circular(10),
-                color: kLightGrayColor,
-              ),
-              child: Center(
-                child: Text(
-                  keypadModel.text,
-                  style: GoogleFonts.bungee(
-                    fontSize: 28,
-                    fontWeight: FontWeight.w700,
-                    color: keypadModel.color,
-                  ),
-                ),
-              ),
-            ),
-          ),
-        ],
+        ),
       ),
     );
   }

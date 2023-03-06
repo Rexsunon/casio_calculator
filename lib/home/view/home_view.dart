@@ -2,14 +2,33 @@ import 'package:casio_calculator/home/components/keypad.dart';
 import 'package:casio_calculator/utils/color_constants.dart';
 import 'package:casio_calculator/utils/constants.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:flutter_staggered_grid_view/flutter_staggered_grid_view.dart';
 
-class HomeView extends StatelessWidget {
+class HomeView extends HookWidget {
   const HomeView({Key? key}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
     final size = MediaQuery.of(context).size;
+
+    final animationController = useAnimationController(
+      duration: const Duration(milliseconds: 500),
+      lowerBound: 0.0,
+      upperBound: 0.1,
+    )..addListener(() { });
+
+    final scale = useState<double>(1 - animationController.value);
+
+    void tapDown(TapDownDetails details) {
+      // print(scale);
+      animationController.forward();
+    }
+
+    void tapUp(TapUpDetails details) {
+      print(scale);
+    animationController.reverse();
+  }
 
     return Scaffold(
       body: SafeArea(
@@ -35,7 +54,7 @@ class HomeView extends StatelessWidget {
                     ],
                   ),
                   Wrap(
-                    spacing: 3,
+                    spacing: 5,
                     children: [
                       _casioLedBox(),
                       _casioLedBox(),
@@ -60,23 +79,32 @@ class HomeView extends StatelessWidget {
             const SizedBox(height: 30),
             Expanded(
               child: Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 20.0),
-                child: StaggeredGrid.count(
-                  axisDirection: AxisDirection.down,
-                  crossAxisCount: 4,
-                  mainAxisSpacing: 20,
-                  crossAxisSpacing: 20,
-                    // childAspectRatio: 1.03
-                  children: [
-                    ...keypadTexts.map((keypad) {
-                      final crossAxisCellCount = keypad.text == '0' ? 2 : 1;
-                      return StaggeredGridTile.count(
-                        crossAxisCellCount: crossAxisCellCount,
-                        mainAxisCellCount: 1,
-                        child: Keypad(keypadModel: keypad),
-                      );
-                    })
-                  ],
+                padding: const EdgeInsets.symmetric(horizontal: 23.0),
+                child: SingleChildScrollView(
+                  child: StaggeredGrid.count(
+                    axisDirection: AxisDirection.down,
+                    crossAxisCount: 4,
+                    mainAxisSpacing: 20,
+                    crossAxisSpacing: 20,
+                      // childAspectRatio: 1.03
+                    children: [
+                      ...keypadTexts.map((keypad) {
+                        final crossAxisCellCount = keypad.text == '0' ? 2 : 1;
+                        return StaggeredGridTile.count(
+                          crossAxisCellCount: crossAxisCellCount,
+                          mainAxisCellCount: 1,
+                          child: GestureDetector(
+                            onTapDown: tapDown,
+                            onTapUp: tapUp,
+                            child: Transform.scale(
+                              scale: scale.value,
+                              child: Keypad(keypadModel: keypad),
+                            ),
+                          ),
+                        );
+                      }),
+                    ],
+                  ),
                 ),
               ),
             ),
@@ -86,34 +114,19 @@ class HomeView extends StatelessWidget {
     );
   }
 
-  SizedBox _casioLedBox() {
-    return SizedBox(
-      width: 24,
-      height: 24,
-      child: Stack(
-        children: [
-          Align(
-            alignment: Alignment.bottomRight,
-            child: Container(
-              width: 20,
-              height: 18,
-              decoration: BoxDecoration(
-                border: Border.all(),
-                color: kJetBlackColor,
-              ),
-            ),
-          ),
-          Align(
-            alignment: Alignment.topLeft,
-            child: Container(
-              width: 22,
-              height: 22,
-              decoration: BoxDecoration(
-                border: Border.all(width: 1.5),
-                borderRadius: BorderRadius.circular(2),
-                color: kLightGrayColor,
-              ),
-            ),
+  Container _casioLedBox() {
+    return Container(
+      width: 22,
+      height: 22,
+      decoration: BoxDecoration(
+        border: Border.all(width: 1.5),
+        borderRadius: BorderRadius.circular(2),
+        color: kLightGrayColor,
+        boxShadow: const [
+          BoxShadow(
+            color: Colors.black,
+            blurStyle: BlurStyle.solid,
+            offset: Offset(2.5, 2.5),
           ),
         ],
       ),
