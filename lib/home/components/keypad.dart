@@ -5,19 +5,26 @@ import 'package:flutter/material.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:google_fonts/google_fonts.dart';
 
-class Keypad extends HookWidget {
+class Keypad extends StatefulHookWidget {
   const Keypad({Key? key, required this.keypadModel}) : super(key: key);
 
   final KeypadModel keypadModel;
 
   @override
+  State<Keypad> createState() => _KeypadState();
+}
+
+class _KeypadState extends State<Keypad> {
+  @override
   Widget build(BuildContext context) {
 
     final animationController = useAnimationController(
-      duration: const Duration(milliseconds: 500),
+      duration: const Duration(milliseconds: 300),
       lowerBound: 0.0,
       upperBound: 0.1,
-    );
+    )..addListener(() {
+      setState(() { });
+    });
 
     final scale = useState<double>(1 - animationController.value);
 
@@ -47,11 +54,11 @@ class Keypad extends HookWidget {
           ),
           child: Center(
             child: Text(
-              keypadModel.text,
+              widget.keypadModel.text,
               style: GoogleFonts.bungee(
                 fontSize: 28,
                 fontWeight: FontWeight.w700,
-                color: keypadModel.color,
+                color: widget.keypadModel.color,
               ),
             ),
           ),

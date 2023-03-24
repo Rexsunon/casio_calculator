@@ -60,8 +60,9 @@ class HomeView extends StatelessWidget {
             const SizedBox(height: 30),
             Expanded(
               child: Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 23.0),
+                padding: const EdgeInsets.symmetric(horizontal: 20.0),
                 child: SingleChildScrollView(
+                  physics: const NeverScrollableScrollPhysics(),
                   child: StaggeredGrid.count(
                     axisDirection: AxisDirection.down,
                     crossAxisCount: 4,
